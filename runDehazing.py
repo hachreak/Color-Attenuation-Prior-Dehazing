@@ -55,11 +55,11 @@ def estA(img, Jdark):
     Amag = np.zeros((1, n_bright, 1), dtype=np.float32)
     
     # Compute magnitudes of RGB vectors of A
-    for i in xrange(n_bright):
+    for i in range(n_bright):
         x = Loc[0,h*w-1-i]
-        ix[x/w, x%w, 0] = 0
-        ix[x/w, x%w, 1] = 0
-        ix[x/w, x%w, 2] = 1
+        ix[x//w, x%w, 0] = 0
+        ix[x//w, x%w, 1] = 0
+        ix[x//w, x%w, 2] = 1
         
         Acand[0, i, :] = Ics[0, Loc[0, h*w-1-i], :]
         Amag[0, i] = np.linalg.norm(Acand[0,i,:])
@@ -75,7 +75,7 @@ def estA(img, Jdark):
         A = Acand[0, Loc2[0,n_bright-len(Y2):n_bright],:]
     
     # finds the max of the 20 brightest pixels in original image
-    print A
+    print(A)
 
     #cv2.imshow("brightest",ix)
     #cv2.waitKey()
@@ -83,9 +83,8 @@ def estA(img, Jdark):
     
     return A
 
-if __name__ == "__main__":
-    #参数设置
-    inputImagePath = "data/input.png" #输入图片路径
+def run(inputImagePath, outputImagePath):
+    #inputImagePath = "ug2/JPEGImages/BL_Bing_092.png"
     r = 15 #最小值滤波时的框的大小
     beta = 1.0 #散射系数
     gimfiltR = 60 #引导滤波时半径的大小
@@ -99,9 +98,9 @@ if __name__ == "__main__":
     tR = np.exp(-beta * refineDR)
     tP = np.exp(-beta * dP)
 
-    cv2.imwrite("data/originalDepthMap.png", dR*255)
-    cv2.imwrite("data/refineDepthMap.png", refineDR*255)
-    cv2.imwrite("data/transmission.png", tR*255)
+    # cv2.imwrite("data/originalDepthMap.png", dR*255)
+    # cv2.imwrite("data/refineDepthMap.png", refineDR*255)
+    # cv2.imwrite("data/transmission.png", tR*255)
 
     a = estA(I, dR)
 
@@ -127,4 +126,14 @@ if __name__ == "__main__":
     J[:, :, 1] = J[:, :, 1]  + a[0, 1]
     J[:, :, 2] = J[:, :, 2]  + a[0, 2]
 
-    cv2.imwrite("data/"+str(r)+"_beta"+str(beta)+".png", J*255)
+    cv2.imwrite(outputImagePath, J*255)
+
+
+if __name__ == "__main__":
+    basepath = sys.argv[1]
+    output = sys.argv[2]
+    for path in os.listdir(basepath):
+        fullpath = os.path.join(basepath, path)
+        outpath = os.path.join(output, path)
+        print(fullpath, outpath)
+        run(fullpath, outpath)
