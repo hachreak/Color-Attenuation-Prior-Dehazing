@@ -2,7 +2,7 @@
 import numpy as np
 import cv2
 
-class GuidedFilter:
+class GuidedFilter(object):
     
     def __init__(self, I, radius=5, epsilon=0.4):
 
@@ -109,7 +109,7 @@ class GuidedFilter:
 
     def filter(self, p):
         
-        p_32F = _toFloatImg(p)
+        p_32F = self._toFloatImg(p)
         ab = self._computeCoefficients(p)
         return self._computeOutput(ab, self._I)
 
